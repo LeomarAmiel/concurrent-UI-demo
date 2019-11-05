@@ -1,26 +1,55 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, Suspense } from "react";
+import "./App.css";
+import { fetchProfileData } from "./fakeApi";
+
+const initialResource = fetchProfileData();
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [resource, setResouce] = React.useState(initialResource);
+    return (
+        <div>
+            <button
+                onClick={() => {
+                    setResouce(fetchProfileData());
+                }}
+            >
+                Next
+            </button>
+            <div className="App">test</div>
+            <ProfilePage resource={resource} />
+        </div>
+    );
+}
+
+function ProfilePage({ resource }) {
+    return (
+        <Suspense fallback={<h1>Loading bebi...</h1>}>
+            <ProfileDetails resource={resource} />
+            <Suspense fallback={<h1>Loading posts...</h1>}>
+                <ProfilePosts resource={resource} />
+            </Suspense>
+        </Suspense>
+    );
+}
+
+function ProfileDetails({ resource }) {
+    const user = resource.user.read();
+    return (
+        <h1>
+            {user.name.first} {user.name.last}
+        </h1>
+    );
+}
+
+function ProfilePosts({ resource }) {
+    const posts = resource.posts.read() || [];
+    return (
+        <div>
+            {posts.map((post, index) => (
+                <p key={post.character + index}>{post.quote}</p>
+            ))}
+        </div>
+    );
 }
 
 export default App;
