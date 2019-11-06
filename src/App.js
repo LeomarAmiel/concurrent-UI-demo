@@ -1,19 +1,23 @@
-import React, { useState, Suspense } from "react";
+import React, { useState, useTransition, Suspense } from "react";
 import "./App.css";
 import { fetchProfileData } from "./fakeApi";
 
 const initialResource = fetchProfileData();
 
 function App() {
-    const [resource, setResouce] = React.useState(initialResource);
+    const [resource, setResouce] = useState(initialResource);
+    const [startTransition, isPending] = useTransition({ timeoutMs: 1000 });
     return (
         <div>
             <button
-                onClick={() => {
-                    setResouce(fetchProfileData());
-                }}
+                disabled={isPending}
+                onClick={() =>
+                    startTransition(() => {
+                        setResouce(fetchProfileData());
+                    })
+                }
             >
-                Next
+                {isPending ? "Loading" : "Next"}
             </button>
             <div className="App">test</div>
             <ProfilePage resource={resource} />
