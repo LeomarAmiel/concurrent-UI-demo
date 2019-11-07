@@ -8,7 +8,7 @@ function App() {
     const [resource, setResouce] = useState(initialResource);
     const [startTransition, isPending] = useTransition({ timeoutMs: 1000 });
     return (
-        <div>
+        <div className="App">
             <button
                 disabled={isPending}
                 onClick={() =>
@@ -17,9 +17,9 @@ function App() {
                     })
                 }
             >
-                {isPending ? "Loading" : "Next"}
+                Next
             </button>
-            <div className="App">test</div>
+            {isPending ? spinner : null}
             <ProfilePage resource={resource} />
         </div>
     );
@@ -29,8 +29,11 @@ function ProfilePage({ resource }) {
     return (
         <Suspense fallback={<h1>Loading bebi...</h1>}>
             <ProfileDetails resource={resource} />
-            <Suspense fallback={<h1>Loading posts...</h1>}>
+            <Suspense fallback={<h2>Loading posts...</h2>}>
                 <ProfilePosts resource={resource} />
+            </Suspense>
+            <Suspense fallback={<h2>Loading quotes...</h2>}>
+                <SwansonQuotes resource={resource} />
             </Suspense>
         </Suspense>
     );
@@ -49,11 +52,35 @@ function ProfilePosts({ resource }) {
     const posts = resource.posts.read() || [];
     return (
         <div>
-            {posts.map((post, index) => (
-                <p key={post.character + index}>{post.quote}</p>
-            ))}
+            <h2>Posts</h2>
+
+            <div>
+                {posts.map((post, index) => (
+                    <p key={post.character + index}>{post.quote}</p>
+                ))}
+            </div>
         </div>
     );
 }
+
+function SwansonQuotes({ resource }) {
+    const posts = resource.swansonQuotes.read() || [];
+    return (
+        <div>
+            <h2>Quotes</h2>
+            <div>
+                {posts.map((post, index) => (
+                    <p key={"swanson" + index}>{post}</p>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+const spinner = (
+    <span className="DelayedSpinner">
+        <span>Loading</span>
+    </span>
+);
 
 export default App;

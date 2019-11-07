@@ -17,6 +17,20 @@ function fetchPosts() {
     );
 }
 
+function fetcSwansonQuotes() {
+    return fetch("http://ron-swanson-quotes.herokuapp.com/v2/quotes/3").then(
+        res => {
+            const promise = new Promise(function(resolve, reject) {
+                setTimeout(() => {
+                    resolve(res.json());
+                }, 3500);
+            });
+            return promise;
+        }
+    );
+}
+
+
 function wrapPromise(promise) {
     let status = "pending";
     let result;
@@ -43,11 +57,13 @@ function wrapPromise(promise) {
     };
 }
 
-export function fetchProfileData(userId) {
-    let userPromise = fetchUser(userId);
-    let postsPromise = fetchPosts(userId);
+export function fetchProfileData() {
+    let userPromise = fetchUser();
+    let postsPromise = fetchPosts();
+    let swansonPromise = fetcSwansonQuotes();
     return {
         user: wrapPromise(userPromise),
-        posts: wrapPromise(postsPromise)
+        posts: wrapPromise(postsPromise),
+        swansonQuotes: wrapPromise(swansonPromise),
     };
 }
